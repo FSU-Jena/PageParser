@@ -9,8 +9,6 @@ import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.URL;
 
-import edu.fsuj.csb.tools.xml.Tools;
-
 /**
  * 
  * Contains methods to simply read remote (an local) files
@@ -22,6 +20,10 @@ public class PageFetcher {
 	private final static int divisor = 1024 * 1024; // if file is downloaded, after every <divisor> bytes, a progress message will be displayed
 	//private static TreeSet<URL> fetchedPages;
 	private static String cacheDir="cache";
+	
+	public static String cachedFile(URL url){
+		return cacheDir+"/"+url.toString().replace(":", "/").replace("//", "/").replace("?", ""); // strip slashes from filename
+	}
 
 	/**
 	 * tries to open the page given by URL, download it and stream it into a StringBuffer
@@ -33,7 +35,7 @@ public class PageFetcher {
 	public static StringBuffer fetch(URL url) throws IOException {
 		boolean isLocal = url.toString().startsWith("file:");
 		boolean rewrite = !isLocal;
-		String cachedFile = cacheDir+"/"+url.toString().replace(":", "/").replace("//", "/").replace("?", ""); // strip slashes from filename
+		String cachedFile = cachedFile(url);
 		StringBuffer result = new StringBuffer(); // create result string buffer
 		BufferedReader br=null;
 		if (!isLocal && (new File(cachedFile)).exists()) { // if data has been downloaded before: read existing file
@@ -41,7 +43,7 @@ public class PageFetcher {
 			br = new BufferedReader(new FileReader(cachedFile));
 			rewrite = false;
 		} else {
-			if (!isLocal) System.out.println("Downloading " + url + "...");
+			if (!isLocal) System.out.print("Downloading " + url + "...");
 			int retry=23;
 			int sleep=1;
 			while (retry>0){
@@ -147,7 +149,7 @@ public class PageFetcher {
 	 * @param dir
 	 */
 	public static void setCache(String dir) {
-		Tools.note("Setting cache directory to "+dir);
+		System.out.println("Setting cache directory to "+dir);
 		cacheDir=dir;
   }
 }
