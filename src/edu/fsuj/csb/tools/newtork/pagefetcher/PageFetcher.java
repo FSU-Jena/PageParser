@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.ConnectException;
 import java.net.URL;
 
 /**
@@ -50,10 +49,11 @@ public class PageFetcher {
 				try {				
 					br = new BufferedReader(new InputStreamReader(url.openStream())); // if data was not downloaded before: start download
 					break;
-				} catch (ConnectException ce){
+				} catch (IOException ce){
 					retry--;					
 					if (retry==0) throw ce;
 					try {
+						System.err.println("Could not read from "+url+". Will retry "+retry+" more times. Next trial in "+(sleep/1000.0)+" seconds.");
 	          Thread.sleep(sleep);
 	          sleep*=2;
           } catch (InterruptedException e) {}
