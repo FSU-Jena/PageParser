@@ -19,10 +19,16 @@ public class PageFetcher {
 	private final static int divisor = 1024 * 1024; // if file is downloaded, after every <divisor> bytes, a progress message will be displayed
 	//private static TreeSet<URL> fetchedPages;
 	private static String cacheDir="cache";
+	private static int retryCount=23;
 	
 	public static String cachedFile(URL url){
 		return cacheDir+"/"+url.toString().replace(":", "/").replace("//", "/").replace("?", ""); // strip slashes from filename
 	}
+	
+	public static void setRetry(int r){
+		retryCount=r;
+	}
+	
 
 	/**
 	 * tries to open the page given by URL, download it and stream it into a StringBuffer
@@ -43,7 +49,7 @@ public class PageFetcher {
 			rewrite = false;
 		} else {
 			if (!isLocal) System.out.print("Downloading " + url + "...");
-			int retry=23;
+			int retry=retryCount;
 			int sleep=1;
 			while (retry>0){
 				try {				
@@ -54,9 +60,9 @@ public class PageFetcher {
 					if (retry==0) throw ce;
 					try {
 						System.err.println("Could not read from "+url+". Will retry "+retry+" more times. Next trial in "+(sleep/1000.0)+" seconds.");
-	          Thread.sleep(sleep);
-	          sleep*=2;
-          } catch (InterruptedException e) {}
+						Thread.sleep(sleep);
+						sleep*=2;
+					} catch (InterruptedException e) {}
 				}
 			}
 		}
