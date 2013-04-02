@@ -56,7 +56,11 @@ public class PageFetcher {
 					br = new BufferedReader(new InputStreamReader(url.openStream())); // if data was not downloaded before: start download
 					break;
 				} catch (IOException ce){
-					retry--;					
+					retry--;			
+					if (retry==0) {
+						ce.printStackTrace();
+						break; // TODO: remove this line
+					}
 					if (retry==0) throw ce;
 					try {
 						System.err.println("Could not read from "+url+". Will retry "+retry+" more times. Next trial in "+(sleep/1000.0)+" seconds.");
@@ -69,6 +73,7 @@ public class PageFetcher {
 		int s = 0;
 		s=0;
 		String line;
+		if (br==null) return result;
 		while (null!=(line=br.readLine())) { // read line by line
 			result.append(line+"\n");
 			if (!isLocal && rewrite) {
